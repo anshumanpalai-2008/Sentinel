@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+websockets
+sqlalchemy[asyncio]
+aiosqlite
+greenlet
+python-multipart
+httpx
+pydantic
+python-dotenv

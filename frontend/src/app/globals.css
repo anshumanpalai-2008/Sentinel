@@ -1,0 +1,152 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Custom scrollbar ─────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0a0a0f;
+}
+::-webkit-scrollbar-thumb {
+  background: #1e1e2e;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #6366f1;
+}
+
+/* ─── Agent terminal text ──────────────────────────────────────── */
+.terminal-text {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Courier New', monospace;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+}
+
+.terminal-glow {
+  color: #22c55e;
+  text-shadow: 0 0 8px rgba(34, 197, 94, 0.6), 0 0 16px rgba(34, 197, 94, 0.3);
+}
+
+.terminal-cursor::after {
+  content: '▋';
+  animation: blink 1s step-end infinite;
+  color: #22c55e;
+  margin-left: 2px;
+}
+
+/* ─── Pulse animation for live indicators ──────────────────────── */
+@keyframes livePulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5);
+    opacity: 1;
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(34, 197, 94, 0);
+    opacity: 0.8;
+  }
+}
+
+.live-dot {
+  animation: livePulse 2s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+/* ─── Graph node styles ────────────────────────────────────────── */
+.react-flow__node {
+  border-radius: 8px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.react-flow__edge-path {
+  stroke: #1e1e2e;
+  stroke-width: 2;
+}
+
+.react-flow__minimap {
+  background: #111118 !important;
+  border: 1px solid #1e1e2e !important;
+  border-radius: 8px !important;
+}
+
+.react-flow__minimap-mask {
+  fill: rgba(99, 102, 241, 0.15) !important;
+}
+
+.react-flow__controls {
+  background: #111118 !important;
+  border: 1px solid #1e1e2e !important;
+  border-radius: 8px !important;
+}
+
+.react-flow__controls-button {
+  background: #111118 !important;
+  border-color: #1e1e2e !important;
+  color: #6b7280 !important;
+  fill: #6b7280 !important;
+}
+
+.react-flow__controls-button:hover {
+  background: #1e1e2e !important;
+}
+
+.react-flow__background {
+  background-color: #0a0a0f !important;
+}
+
+/* ─── Policy intercept glow ────────────────────────────────────── */
+@keyframes policyGlow {
+  0%, 100% { box-shadow: 0 0 8px rgba(239, 68, 68, 0.4), 0 0 16px rgba(239, 68, 68, 0.2); }
+  50%       { box-shadow: 0 0 16px rgba(239, 68, 68, 0.7), 0 0 32px rgba(239, 68, 68, 0.4); }
+}
+
+.policy-node-glow {
+  animation: policyGlow 1.5s ease-in-out infinite;
+}
+
+/* ─── Grid background ──────────────────────────────────────────── */
+.bg-grid {
+  background-image:
+    linear-gradient(rgba(99, 102, 241, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99, 102, 241, 0.04) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* ─── Loading skeleton ─────────────────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    #111118 25%,
+    #1e1e2e 50%,
+    #111118 75%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 1.8s infinite linear;
+  border-radius: 4px;
+}
+
+/* ─── Gradient text ────────────────────────────────────────────── */
+.gradient-text {
+  background: linear-gradient(135deg, #6366f1, #a78bfa, #ec4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Transition defaults ──────────────────────────────────────── */
+* {
+  transition-property: color, background-color, border-color, box-shadow, opacity, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
