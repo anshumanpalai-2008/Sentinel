@@ -1,13 +1,6 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
 import './globals.css'
 import Sidebar from '@/components/layout/Sidebar'
-
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-inter',
-  display: 'swap',
-})
 
 export const metadata: Metadata = {
   title: 'SENTINEL — AI Agent Command & Control',
@@ -24,7 +17,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en">
       <body className="bg-sentinel-bg text-white antialiased font-sans min-h-screen">
         <Sidebar />
         {/* Main content offset by sidebar width */}
@@ -33,3 +26,4 @@ export default function RootLayout({
     </html>
   )
 }
+
