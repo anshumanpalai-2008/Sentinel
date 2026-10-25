@@ -1,5 +1,8 @@
+'use client'
+
+import { useState } from 'react'
 import Link from 'next/link'
-import { ArrowUpRight, Filter } from 'lucide-react'
+import { ArrowUpRight, Filter, Search } from 'lucide-react'
 import StatusBadge from '@/components/ui/StatusBadge'
 import { MOCK_SESSIONS } from '@/lib/api'
 import type { SessionStatus } from '@/lib/types'
@@ -73,20 +76,57 @@ const STEP_COUNTS: Record<string, number> = {
 }
 
 export default function HistoryPage() {
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedStatus, setSelectedStatus] = useState<string>('all')
+
+  const filteredSessions = allSessions.filter((s) => {
+    const matchesSearch =
+      s.task.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      s.id.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesStatus =
+      selectedStatus === 'all' ? true : s.status === selectedStatus
+    return matchesSearch && matchesStatus
+  })
+
   return (
     <div className="min-h-screen bg-grid bg-sentinel-bg p-8">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-bold text-white mb-1">Session History</h1>
           <p className="text-sm text-sentinel-muted">
-            All past and current agent sessions — click any row to view details
+            All past and current agent sessions — click any row to inspect execution
           </p>
         </div>
 
-        <div className="flex items-center gap-2 px-3 py-2 bg-sentinel-surface border border-sentinel-border rounded-lg text-sm text-sentinel-muted">
-          <Filter className="w-4 h-4" />
-          All Status
+        {/* Search & Filter Controls */}
+        <div className="flex items-center gap-3">
+          {/* Search bar */}
+          <div className="relative">
+            <Search className="w-4 h-4 text-sentinel-muted absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              placeholder="Search sessions or tasks..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="bg-sentinel-surface border border-sentinel-border rounded-lg pl-9 pr-4 py-2 text-sm text-white placeholder-sentinel-muted focus:outline-none focus:border-sentinel-accent w-64 transition-colors"
+            />
+          </div>
+
+          {/* Status Filter Dropdown */}
+          <div className="flex items-center gap-2 px-3 py-2 bg-sentinel-surface border border-sentinel-border rounded-lg text-sm text-sentinel-muted">
+            <Filter className="w-4 h-4" />
+            <select
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              className="bg-transparent text-white text-sm focus:outline-none cursor-pointer"
+            >
+              <option value="all" className="bg-sentinel-surface text-white">All Status</option>
+              <option value="completed" className="bg-sentinel-surface text-white">Completed</option>
+              <option value="blocked" className="bg-sentinel-surface text-white">Blocked</option>
+              <option value="failed" className="bg-sentinel-surface text-white">Failed</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -105,56 +145,62 @@ export default function HistoryPage() {
 
         {/* Rows */}
         <div className="divide-y divide-sentinel-border">
-          {allSessions.map((session) => (
-            <Link
-              key={session.id}
-              href={`/agents/${session.id}`}
-              className="grid grid-cols-[1fr_120px_60px_100px_90px_100px_160px_48px] gap-4 px-6 py-4 items-center hover:bg-white/5 transition-colors group"
-            >
-              {/* Task */}
-              <div className="min-w-0">
-                <p className="text-sm font-medium text-white truncate group-hover:text-sentinel-accent transition-colors">
-                  {session.task}
-                </p>
-                <p className="text-xs text-sentinel-muted mt-0.5 font-mono">
-                  {session.id.slice(5, 13)}
-                </p>
-              </div>
+          {filteredSessions.length === 0 ? (
+            <div className="p-8 text-center text-sentinel-muted text-sm">
+              No sessions match your search or filter criteria.
+            </div>
+          ) : (
+            filteredSessions.map((session) => (
+              <Link
+                key={session.id}
+                href={`/agents/${session.id}`}
+                className="grid grid-cols-[1fr_120px_60px_100px_90px_100px_160px_48px] gap-4 px-6 py-4 items-center hover:bg-white/5 transition-colors group"
+              >
+                {/* Task */}
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-white truncate group-hover:text-sentinel-accent transition-colors">
+                    {session.task}
+                  </p>
+                  <p className="text-xs text-sentinel-muted mt-0.5 font-mono">
+                    {session.id.slice(5, 13)}
+                  </p>
+                </div>
 
-              {/* Status */}
-              <StatusBadge status={session.status} />
+                {/* Status */}
+                <StatusBadge status={session.status} />
 
-              {/* Steps */}
-              <div className="text-sm font-mono text-sentinel-muted">
-                {STEP_COUNTS[session.id] ?? '—'}
-              </div>
+                {/* Steps */}
+                <div className="text-sm font-mono text-sentinel-muted">
+                  {STEP_COUNTS[session.id] ?? '—'}
+                </div>
 
-              {/* Tokens */}
-              <div className="text-sm font-mono text-white">
-                {session.total_tokens.toLocaleString()}
-              </div>
+                {/* Tokens */}
+                <div className="text-sm font-mono text-white">
+                  {session.total_tokens.toLocaleString()}
+                </div>
 
-              {/* Cost */}
-              <div className="text-sm font-mono text-white">
-                ${session.total_cost_usd.toFixed(4)}
-              </div>
+                {/* Cost */}
+                <div className="text-sm font-mono text-white">
+                  ${session.total_cost_usd.toFixed(4)}
+                </div>
 
-              {/* Duration */}
-              <div className="text-sm font-mono text-sentinel-muted">
-                {formatDuration(session.created_at, session.completed_at)}
-              </div>
+                {/* Duration */}
+                <div className="text-sm font-mono text-sentinel-muted">
+                  {formatDuration(session.created_at, session.completed_at)}
+                </div>
 
-              {/* Date */}
-              <div className="text-xs text-sentinel-muted">
-                {formatDate(session.created_at)}
-              </div>
+                {/* Date */}
+                <div className="text-xs text-sentinel-muted">
+                  {formatDate(session.created_at)}
+                </div>
 
-              {/* Action icon */}
-              <div className="flex justify-end">
-                <ArrowUpRight className="w-4 h-4 text-sentinel-muted group-hover:text-sentinel-accent transition-colors" />
-              </div>
-            </Link>
-          ))}
+                {/* Action icon */}
+                <div className="flex justify-end">
+                  <ArrowUpRight className="w-4 h-4 text-sentinel-muted group-hover:text-sentinel-accent transition-colors" />
+                </div>
+              </Link>
+            ))
+          )}
         </div>
       </div>
 

@@ -16,7 +16,7 @@ import ExecutionGraph from '@/components/agents/ExecutionGraph'
 import PolicyAlertStack from '@/components/agents/PolicyAlert'
 import StatusBadge from '@/components/ui/StatusBadge'
 import { useAgentWebSocket } from '@/lib/websocket'
-import { MOCK_SESSIONS, MOCK_STEPS } from '@/lib/api'
+import { MOCK_SESSIONS, MOCK_STEPS, SESSION_SPECIFIC_STEPS } from '@/lib/api'
 import type { AgentSession } from '@/lib/types'
 
 // ─── Live timer ────────────────────────────────────────────────────────────
@@ -64,8 +64,10 @@ export default function AgentSessionPage() {
     }
   }, [sessionId])
 
-  // For demo: use mock steps when no WS
-  const steps = useMock ? MOCK_STEPS : ws.steps
+  // For demo: use session-specific steps if available, otherwise fallback
+  const steps = useMock
+    ? (SESSION_SPECIFIC_STEPS[sessionId] ?? MOCK_STEPS)
+    : ws.steps
   const status = useMock ? (session?.status ?? 'completed') : ws.status
   const isRunning = status === 'running'
   const isConnected = useMock ? false : ws.isConnected
